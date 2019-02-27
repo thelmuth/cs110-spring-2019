@@ -1,29 +1,34 @@
 
+import random
+
 # word_grid = [["one", "two", "three"],
 #              ["a", "b", "c"],
 #              ["hat", "cat", "bat"],
 #              ["apple", "banana", "cherry"]]
 #
+# print(word_grid)
+# print(word_grid[2])
 # print(word_grid[2][1])
 #
-# for bag in word_grid:
-#     print(bag)
-
+# for row in word_grid:
+#     print(row)
 
 WIDTH = 12
+DIRECTIONS = ["right", "left", "up", "down"]
 
 def main():
 
-    # # Bad idea, makes aliases for every row
+    # BAD: Doesn't make copies of rows
     # row = ["empty"] * WIDTH
     # room = [row] * WIDTH
 
     room = []
     for _ in range(WIDTH):
-        row = ["empty"] * WIDTH
+        row = ["dirt"] * WIDTH
         room.append(row)
 
-    #print(room)
+    # print(room)
+
     # for row in room:
     #     print(row)
     # print()
@@ -44,41 +49,128 @@ def main():
 
     print_room(room)
 
-    room = move_robot(room, "right")
-    print_room(room)
+    # for _ in range(6):
+    #     direct = input("Enter which direction the robot should move: ")
+    #     room = move_robot(room, direct)
+    #     print_room(room)
+
+
+    # visits = random_walk(room, 10000)
+
+    visits = clean_room(room)
+
+    for row in visits:
+        for num in row:
+            print("{:5d}".format(num), end="")
+        print()
+
 
 
     # for i in range(5):
-    #     print(i, "hi", "yay", end="$$")
+    #     print(i, "woo", i *i, end="CAT", sep="?")
+    # print("DONE")
 
 
 def print_room(room):
-    """Prints a robot's room"""
+    """Prints a nice representation of the robot's room"""
+
     for row in room:
-        for element in row:
-            if element == "empty":
-                print(" ", end="")
-            elif element == "robot":
-                print("R", end="")
-            elif element == "obstacle":
+        for cell in row:
+            if cell == "obstacle":
                 print("O", end="")
+            elif cell == "robot":
+                print("R", end="")
+            elif cell == "empty":
+                print(" ", end="")
+            elif cell == "dirt":
+                print("*", end="")
+
         print()
-    print()
 
 def robot_location(room):
-    """Find's the robot's location in a room"""
+    """Find the robot's row and column in the room"""
 
     for r in range(WIDTH):
         for c in range(WIDTH):
             if room[r][c] == "robot":
                 return (r, c)
 
+
 def move_robot(room, direction):
-    """Moves the robot in given direction, if it doesn't hit an obstacle"""
+    """Moves robot one cell in specified direction"""
 
     robot_row, robot_col = robot_location(room)
 
-    print(robot_row, robot_col)
+    intended_row = robot_row
+    intended_col = robot_col
+
+    if direction == "right":
+        intended_col = robot_col + 1
+    elif direction == "left":
+        intended_col = robot_col - 1
+    elif direction == "up":
+        intended_row = robot_row - 1
+    elif direction == "down":
+        intended_row = robot_row + 1
+
+    if room[intended_row][intended_col] != "obstacle":
+        room[intended_row][intended_col] = "robot"
+        room[robot_row][robot_col] = "empty"
+
+    return room
+
+def random_walk(room, steps):
+    """Randomly moves robot around room for steps steps"""
+
+    # Track the robot location
+    visits = []
+    for _ in range(WIDTH):
+        row = [0] * WIDTH
+        visits.append(row)
+
+    for i in range(steps):
+        direction = random.choice(DIRECTIONS)
+        room = move_robot(room, direction)
+
+        print("After {} steps, robot moved {}, and the room looks like:".format(i, direction))
+        print_room(room)
+
+        r, c = robot_location(room)
+        visits[r][c] += 1
+
+    return visits
+
+def all_clean(room):
+    """Return True if the room has no dirt, False otherwise"""
+
+    for row in room:
+        for cell in row:
+            if cell == "dirt":
+                return False
+
+    return True
+
+def clean_room(room):
+
+    # Track the robot location
+    visits = []
+    for _ in range(WIDTH):
+        row = [0] * WIDTH
+        visits.append(row)
+
+    i = 0
+    while not all_clean(room):
+        i += 1
+        direction = random.choice(DIRECTIONS)
+        room = move_robot(room, direction)
+
+        print("After {} steps, robot moved {}, and the room looks like:".format(i, direction))
+        print_room(room)
+
+        r, c = robot_location(room)
+        visits[r][c] += 1
+
+    return visits
 
 if __name__ == "__main__":
     main()
