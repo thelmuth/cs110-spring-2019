@@ -14,8 +14,16 @@ class Azul:
     def __init__(self):
 
         # For now, assume a 2-player game
-        NUMBER_OF_PLAYERS = 2
+        self._number_of_players = 2
         NUMBER_OF_FACTORIES = 5
+
+        # Store the player names in a list
+        self._player_names = []
+        for x in range(self._number_of_players):
+            player = input("Enter name of player {}: ".format(x + 1))
+            self._player_names.append(player)
+
+        self._current_player = 0
 
         self._bag = Bag()
 
@@ -38,6 +46,43 @@ class Azul:
             result += str(index) + ". " + str(self._factories[index]) + "\n"
 
         return result
+
+    def play_game(self):
+        """Controls the entire game of Azul, from beginning to end."""
+
+        self.begin_round()
+
+        # NOTE: We'll later change this condition to stop when the round ends
+        while True:
+
+            self.take_turn()
+
+
+    def take_turn(self):
+        """Let's current player take one turn."""
+        
+        print(self)
+
+        # For now, let's just have one player take one turn
+        factory_number = int(input("{}, which factory do you want to pick from: ".format(self._player_names[self._current_player])))
+        color = input("What color tiles do you want to take: ")
+
+        taken_tiles = self._factories[factory_number].take_all_one_color(color)
+
+        print()
+        print("You now have the tiles {}, and the game looks like:".format(taken_tiles))
+
+        self._current_player = (self._current_player + 1) % self._number_of_players
+
+    def begin_round(self):
+        """Called at the start of each round to add tiles to the factories."""
+
+        for fact in self._factories:
+            for _ in range(4):
+                t = self._bag.random_tile()
+                fact.add_tile(t)
+
+
 
 class Tile:
     """Represents tiles of 5 colors"""
@@ -127,7 +172,7 @@ def main():
 
     game = Azul()
 
-    print(game)
+    game.play_game()
 
 
     # tile_bag = Bag()
