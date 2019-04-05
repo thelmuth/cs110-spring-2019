@@ -27,8 +27,11 @@ class Azul:
 
         self._bag = Bag()
 
+        self._center = CenterOfTable()
+
         # Create the factories
         self._factories = []
+        self._factories.append(self._center)
         for _ in range(NUMBER_OF_FACTORIES):
             self._factories.append(Factory())
 
@@ -60,7 +63,7 @@ class Azul:
 
     def take_turn(self):
         """Let's current player take one turn."""
-        
+
         print(self)
 
         # For now, let's just have one player take one turn
@@ -68,6 +71,12 @@ class Azul:
         color = input("What color tiles do you want to take: ")
 
         taken_tiles = self._factories[factory_number].take_all_one_color(color)
+
+        # Put the remaining tiles on the Factory into the center IF the factory
+        # isn't already the center
+        if self._factories[factory_number].is_factory():
+            remaining_tiles = self._factories[factory_number].take_all_remaining_tiles()
+            self._center.add_tiles(remaining_tiles)
 
         print()
         print("You now have the tiles {}, and the game looks like:".format(taken_tiles))
@@ -78,9 +87,10 @@ class Azul:
         """Called at the start of each round to add tiles to the factories."""
 
         for fact in self._factories:
-            for _ in range(4):
-                t = self._bag.random_tile()
-                fact.add_tile(t)
+            if fact.is_factory():
+                for _ in range(4):
+                    t = self._bag.random_tile()
+                    fact.add_tile(t)
 
 
 
@@ -146,6 +156,10 @@ class Factory:
         """Adds a tile to the factory"""
         self._my_tiles.append(tile)
 
+    def add_tiles(self, tiles):
+        """Add all of list of tiles to factory."""
+        self._my_tiles.extend(tiles)
+
     def __str__(self):
         return "Factory with tiles: " + str(self._my_tiles)
 
@@ -167,6 +181,34 @@ class Factory:
 
         return return_list
 
+    def is_factory(self):
+        """Returns True if this object is a Factory."""
+        return True
+
+    def take_all_remaining_tiles(self):
+        """Returns a list of all of Factory's tiles, and empties the factory."""
+        result = self._my_tiles
+        self._my_tiles = []
+        return result
+
+class CenterOfTable(Factory):
+    """Represents the tiles in the center of the table.
+    Note: Inherits from the Factory class, since it acts a lot like a factory
+    but a little different."""
+
+    def __init__(self):
+        """This just calls the Factory constructor, which will initialize
+        the _my_tiles attribute."""
+        Factory.__init__(self)
+        # Could include more setup code here, but we don't need it.
+
+    def __str__(self):
+        result = Factory.__str__(self)
+        return result.replace("Factory", "Center of table")
+
+    def is_factory(self):
+        """Returns True if this object is a Factory."""
+        return False
 
 def main():
 
