@@ -18,8 +18,22 @@ class Car:
 
         self._body = Rectangle(self._window, self._width, self._length, center)
         self._body.set_fill_color(color)
+        self._body.set_depth(10)
 
         self._window.add(self._body)
+
+        self._light1_center = (center[0] - 4, center[1] - 26)
+        self._light2_center = (center[0] + 4, center[1] - 26)
+
+        self._light1 = Circle(self._window, 3, self._light1_center)
+        self._light2 = Circle(self._window, 3, self._light2_center)
+        self._light1.set_depth(5)
+        self._light2.set_depth(5)
+
+        self._window.add(self._light1)
+        self._window.add(self._light2)
+
+        self._components = [self._body, self._light1, self._light2]
 
         self._left_button = Button(self._window, self, (25, 50), "left")
         self._right_button = Button(self._window, self, (75, 50), "right")
@@ -32,26 +46,38 @@ class Car:
         if direction == "forward":
             change_x = self._heading_x * self._distance
             change_y = self._heading_y * self._distance
-            self._body.move(change_x, change_y)
+
+            for component in self._components:
+                component.move(change_x, change_y)
 
         elif direction == "backward":
             change_x = self._heading_x * self._distance * -1
             change_y = self._heading_y * self._distance * -1
-            self._body.move(change_x, change_y)
+
+            for component in self._components:
+                component.move(change_x, change_y)
 
         elif direction == "right":
             old_heading_x = self._heading_x
             self._heading_x = self._heading_y * -1
             self._heading_y = old_heading_x
 
-            self._body.rotate(-90)
+            pivot = self._body.get_pivot()
+
+            for component in self._components:
+                component.set_pivot(pivot)
+                component.rotate(-90)
 
         elif direction == "left":
             old_heading_x = self._heading_x
             self._heading_x = self._heading_y
             self._heading_y = old_heading_x * -1
 
-            self._body.rotate(90)
+            pivot = self._body.get_pivot()
+
+            for component in self._components:
+                component.set_pivot(pivot)
+                component.rotate(90)
 
 class Button(EventHandler):
     """Represents buttons to tell car which way to go."""
