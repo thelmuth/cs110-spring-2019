@@ -1,0 +1,7 @@
+cat
+horse
+duck
+rabbit
+kangaroo
+octopus
+fish
