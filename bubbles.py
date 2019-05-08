@@ -27,6 +27,7 @@ class Cheese(EventHandler):
 
         center = event.get_mouse_location()
         c = Circle(self._win, 10, center)
+        #c.set_fill_color("")
         self._win.add(c)
 
         RunWithYieldDelay(self._win, self.animate_circle(c))
