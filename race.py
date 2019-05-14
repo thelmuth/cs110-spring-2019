@@ -140,6 +140,25 @@ class Race(EventHandler):
 
             yield 1
 
+        winner = 0
+        winner_index = 0
+
+        for i in range(NUM_RUNNERS):
+            if self._runner_x_values[i] > winner:
+                winner = self._runner_x_values[i]
+                winner_index = i
+
+        r = Rectangle(self._window, 300, 50, (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+        r.set_depth(10)
+        r.set_fill_color(self._runners[winner_index].get_fill_color())
+        self._window.add(r)
+
+        t = Text(self._window, "The winner is {}!".format(winner_index), size=32,
+                 center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+        t.set_depth(5)
+        self._window.add(t)
+
+
     def race_over(self):
         """Returns True if someone has passed the finish line."""
 
